@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#observer {
+  width:30px;
+  height:30px;
+  background-color:#EF2;
+  border: solid black;
+  border-radius: 50px/50px;
+  margin:10px;
+}
+#observer.clear {
+  background-color:#FF9;
+  border-color: green;
+}
+#observer.dead {
+  background-color:#F32;
+  border-color: black;
+}
+#field {
+  background-color:gray;
+  width: 280px;
+  height:280px;
+}
+#field div {
+  background-color:lightgray;
+  width:20px;
+  height:20px;
+  float:left;
+  margin:1px;
+  border:solid 3px lightgray;
+  text-align:center;
+}
+#field div.MINE {
+  background-color:#F08;
+}
+#field div.open {
+  background-color:#8F8;
+}
+#field div.flag {
+  border-color: blue;
+}
+</style>
+</head>
+<body>
+<div id="observer" onclick="reset()"></div>
+<div id="field"></div>
+<span id="flags"></span>/<span id="mines"></span>
+<!--
+<form>
+<input type="number" id="custom_width"/>
+<input type="number" id="custom_height"/>
+<input type="number" id="custom_nmine"/>
+</form>
+<button id="apply" onclick="reset(true);">new game</button>
+-->
+<script>
+let WIDTH=10;
+let HEIGHT=10;
+let NMINE=10;
+let is_gameover = false;
+
+function gameover(clear){
+  is_gameover = true;
+  // 地雷をすべて開示する
+  let mines = document.getElementsByClassName('mine');
+  for(let i=0;i<mines.length;i++){
+    mines[i].classList.add('MINE');
+  }
+  // すべてマウス操作不可にする
+  let cells = document.getElementById('field').children;
+  for(let i=0;i<cells.length;i++){
+    cells[i].onclick=()=>false;
+    cells[i].oncontextmenu=()=>false;
+  }
+  // OK/NGを表示
+  let obs = document.getElementById('observer');
+  if(clear){
+    obs.classList.add('clear');
+  }else{
+    obs.classList.add('dead');
+  }
+}
+
+function neighborhood(id){
+  let x = Number(id.replace('cell_','').replace(/_.*/,''));
+  let y = Number(id.replace(/cell_.*_/,''));
+  let ls = [];
+  for(let i=Math.max(0,y-1);i<=Math.min(HEIGHT-1,y+1);i++){
+    for(let j=Math.max(0,x-1);j<=Math.min(WIDTH-1,x+1);j++){
+      const k = 'cell_'+j+'_'+i;
+      if(k!=id){
+        ls.push(k);
+      }
+    }
+  }
+  return ls;
+}
+
+function click(id){
+  document.getElementById('flags').textContent = document.getElementsByClassName('flag').length;
+  let cell = document.getElementById(id);
+  if(true == cell.classList.contains('safe')){
+    return 0;
+  }
+  if(true == cell.classList.contains('mine')){
+    gameover();
+    return "GAMEOVER";
+  }else{
+    let nh = neighborhood(id);
+    // 周囲の地雷の数を数える
+    let cnt = 0;
+    for(let i=0;i<nh.length;i++){
+      const k = nh[i];
+      if(true==document.getElementById(k).classList.contains('mine')){
+        cnt += 1;
+      }
+    }
+    cell.classList.add('open');
+    cell.classList.remove('flag');
+    // 周囲に地雷がなければ、周囲もクリックしたことにする
+    if(cnt==0){
+      cell.classList.add('safe');
+      nh.forEach(function(k){ click(k); });
+    }else{
+      cell.textContent = "" + cnt;
+    }
+    const nopen = document.getElementsByClassName('open').length;
+    if(nopen == WIDTH*HEIGHT-NMINE){
+      gameover(true);
+    }
+    return cnt;
+  }
+}
+
+function flag(id){
+  let cell = document.getElementById(id);
+  // すでに空いていたら旗も何もない。
+  if(true == cell.classList.contains('open')){
+    return false;
+  }
+  if(true == cell.classList.contains('flag')){
+    cell.classList.remove('flag');
+  }else{
+    cell.classList.add('flag');
+  }
+  document.getElementById('flags').textContent = document.getElementsByClassName('flag').length;
+  return false;
+}
+
+function reset(apply){
+  if(apply){
+    WIDTH = Number(document.getElementById('custom_width').value);
+    HEIGHT= Number(document.getElementById('custom_height').value);
+    NMINE = Number(document.getElementById('custom_nmine').value);
+  }
+  is_gameover = false;
+  document.getElementById('flags').textContent = 0;
+  document.getElementById('mines').textContent = NMINE;
+  document.getElementById('observer').className = "";
+  let field = document.getElementById('field');
+  field.textContent="";
+  field.oncontextmenu = ()=>false;
+  // セルの生成
+  for(let y=0;y<HEIGHT;y++){
+    for(let x=0;x<WIDTH;x++){
+      let cell = document.createElement('div');
+      cell.id = "cell_"+x+"_"+y;
+      // 左クリック 
+      cell.onclick = function(e){
+        if(false==is_gameover){
+          click(e.target.id);
+        }
+      };
+      // 右クリック 
+      cell.oncontextmenu = function(e){
+        if(false==is_gameover){
+          flag(e.target.id);
+        }
+        return false;
+      };
+      field.appendChild(cell);
+    }
+  }
+  // 地雷を埋め込む
+  for(let i=0;i<NMINE;i++){
+    while(1){
+      const x = Math.floor(Math.random()*WIDTH);
+      const y = Math.floor(Math.random()*HEIGHT);
+      const id = "cell_"+x+"_"+y;
+      let cell = document.getElementById(id);
+      if(false==cell.classList.contains('mine')){
+        cell.classList.add('mine');
+        break;
+      }
+    }
+  }
+}
+reset();
+</script>
+</body>
+</html>
