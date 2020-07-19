@@ -27,7 +27,8 @@ div.card{
   transition-duration: 0.5s;
   transition-timing-function: ease-in-out;
   }
-div.card:hover {
+/* 選択可能なカードについて、カーソルが乗ったら傾ける */
+div.card.selectable:hover {
   transform: rotate(20deg);
   transition: transform 0.1s ease-in-out;
 }

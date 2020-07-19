@@ -126,10 +126,12 @@ function get_instance_from_dom(dom) {
       flip(dom);
       if(c1==null) {
         c1 = card;
-      } else {
+      }else if(c2==null){
         c2 = card;
         setTimeout(function(){
           if(c1.rank==c2.rank) {
+            c1.dom.classList.remove('selectable');
+            c2.dom.classList.remove('selectable');
             c1.moveto(500,0);
             c2.moveto(500,0);
           } else {
@@ -145,7 +147,11 @@ function get_instance_from_dom(dom) {
   for(let i=0;i<5;i++){
     for(let j=0;j<6;j++){
       let card = deck.shift();
-      setTimeout(()=>card.moveto(i*80, j*100), 100*(j*5+i));
+      setTimeout(()=>{
+        card.moveto(i*80, j*100);
+        // 置き終わってから選択可能にしないと、hoverが効いて移動transformがキャンセルされる
+        setTimeout(()=>{card.dom.classList.add('selectable');}, 300);
+      }, 100*(j*5+i));
     }
   }
 })();
