@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- http://l-sta.com/toybox/2016/01/11/cardflip/ -->
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>CSS3 Transformation Flip the Card</title>
+<link rel="stylesheet" media="all" href="style/styles.css" />
+</head>
+<body>
+<h1>Flip the Card</h1>
+<div id="field"></div>
+<!-- https://qiita.com/nagtkk/items/27ff4f2fe17746afabdd -->
+<script>
+
+
+/*
+ onclick用の関数を生成する
+ return: DOMをクリックした時に、その祖先を検索して
+         classname を含むDOMを見つけたら
+         そのDOM target に対して func(target) を実行する
+*/
+function gen_click_card(classname, func) {
+  return function(e) {
+    for(let i in e.path){
+      target = e.path[i];
+      if(target.classList.contains(classname)){
+        func(target);
+        break;
+      }
+    }
+  }
+}
+function open(card){
+  card.classList.add("open");
+  card.onclick =  gen_click_card('card', close);
+}
+function close(card){
+  card.classList.remove("open");
+  card.onclick = gen_click_card('card', open);
+}
+/*
+  <div class="card">
+    <div class="front">
+      <span>7<br/>&#9824;</span> &#9824; <span>7<br/>&#9824;</span>
+    </div>
+    <div class="back"></div>
+  </div>
+*/
+let field = document.getElementById('field');
+let x=0, y=0;
+["&#9824;","&#9829;","&#9827;","&#9830;"].forEach((m)=>{
+  [...Array(13).keys()].map(x=>x+1).forEach((n)=>{
+    // カードおもて
+    let front = document.createElement('div');
+    let sign = "<span>"+n+"<br/>"+m+"</span>";
+    let pattern = " "+m+" ";
+    front.innerHTML=sign+pattern+sign;
+    front.classList.add('front');
+    // カードうら
+    let back = document.createElement('div');
+    back.classList.add('back');
+    // カード
+    let card = document.createElement('div');
+    card.appendChild(front);
+    card.appendChild(back);
+    card.classList.add('card');
+    card.classList.add((m=="&#9829;"||m=="&#9830;") ? "red" : "black");
+    card.classList.add('open');
+    card.onclick = gen_click_card('card', close);
+    card.style.left = (x+field.offsetLeft)+"px";
+    card.style.top  = (y+field.offsetTop )+"px";
+    x += 60; if(x==(60*13)){ x=0; y += 90; }
+    field.appendChild(card);
+  });
+});
+
+//Array.prototype.forEach.call(
+//  document.getElementsByClassName("card"),
+//  (e)=>{e.onclick = gen_click_card('card', open)}
+//);
+</script>
+</body>
+</html>

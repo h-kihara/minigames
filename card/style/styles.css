@@ -1,0 +1,87 @@
+body{
+  font-family: "ヒラギノ角ゴ ProN W3",
+    "Hiragino Kaku Gothic ProN",
+    "游ゴシック", YuGothic,
+    "メイリオ", Meiryo, sans-serif;
+  margin: 20px;
+  color: #eee;
+  background-color: #444;
+  }
+h1{
+  font-size: 3em;
+  font-weight: normal;
+  margin: 0 0 0.5em 0;
+  text-shadow: 1px 1px 1px #fff, -1px -1px 1px #000;
+  }
+div.card{
+  /* display: inline-block; */
+  /* margin: 20px; */
+  position: absolute;
+  width: 58px;
+  height: 89px;
+  cursor: pointer;
+  /* http://unitopi.com/css-user-select-none/ */
+  user-select: none;
+  -webkit-touch-callout: none;
+  }
+div.card:hover {
+  transform: rotate(20deg);
+  transition: all 0.1s ease-in-out;
+}
+div.card div{
+  position: absolute;
+  width: 50px;
+  height: 81px;
+  font-size: 2em;
+  text-align: center;
+  line-height: 81px;
+  /*color: #000;*/
+  background-color: #fff;
+  border: 4px solid #fff;
+  border-radius: 5px;
+  backface-visibility: hidden;
+  transition: all 0.5s ease-in-out 0s;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+  }
+div.card div span{
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 10px;
+  width: auto;
+  line-height: 10px;
+  }
+div.card div.back{
+  background:
+    linear-gradient(30deg, transparent 50%, rgba(255,255,255,.8) 75%),
+    linear-gradient(200deg, transparent 50%, rgba(255,255,255,.8) 75%),
+    #36c;
+  background-size: 7px 6px;
+  }
+div.card div span:last-child{
+  left: auto;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
+  }
+
+
+div.front{
+  transform: rotateY(-180deg);
+  }
+div.card.open div.back{
+  transform: rotateY(180deg);
+  }
+div.card.open div.front{
+  transform: rotateY(0deg);
+  }
+
+
+.red {
+  color: red;
+  }
+.black {
+  color: black;
+  }
+
