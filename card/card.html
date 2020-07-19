@@ -5,13 +5,16 @@
 <meta charset="UTF-8" />
 <title>CSS3 Transformation Flip the Card</title>
 <link rel="stylesheet" media="all" href="style/styles.css" />
+<script src="script/random.js"></script>
 </head>
 <body>
 <h1>Flip the Card</h1>
 <div id="field"></div>
 <!-- https://qiita.com/nagtkk/items/27ff4f2fe17746afabdd -->
 <script>
-
+const SUIT = ["&#9824;","&#9829;","&#9827;","&#9830;"];
+const RANK = [...Array(13).keys()].map(x=>x+1);
+const field = document.getElementById('field');
 
 /*
  onclick用の関数を生成する
@@ -30,14 +33,38 @@ function gen_click_card(classname, func) {
     }
   }
 }
-function open(card){
-  card.classList.add("open");
-  card.onclick =  gen_click_card('card', close);
+// カードのおもてうらを切り替える
+function flip(dom){
+  if(dom.classList.contains('open')) {
+    dom.classList.remove("open");
+  } else {
+    dom.classList.add("open");
+  }
 }
-function close(card){
-  card.classList.remove("open");
-  card.onclick = gen_click_card('card', open);
+
+let STOCK_LEFT = 880;
+let STOCK_TOP  = 40;
+/*
+// 場からストックに仕舞う  (／ストックから場に出す)
+function moveto(card) {
+  const _stock_left = (STOCK_LEFT+field.offsetLeft)+"px";
+  const _stock_top  = (STOCK_TOP +field.offsetTop )+"px";
+  function is_on_stock(_card) {
+    console.log(_card.style.left,_card.style.top,_stock_left,_stock_top);
+    return _card.style.left==_stock_left && _card.style.top==_stock_top;
+  }
+  if(is_on_stock(card)) {
+    let id = card.id.split("_")[1];
+    let m = Math.floor(id/13);
+    let n = id%13;
+    card.style.left = (n * 60 + field.offsetLeft)+"px";
+    card.style.top  = (m * 90 + field.offsetTop )+"px";
+  }else{
+    card.style.left = _stock_left;
+    card.style.top  = _stock_top;
+  }
 }
+*/
 /*
   <div class="card">
     <div class="front">
@@ -46,38 +73,82 @@ function close(card){
     <div class="back"></div>
   </div>
 */
-let field = document.getElementById('field');
-let x=0, y=0;
-["&#9824;","&#9829;","&#9827;","&#9830;"].forEach((m)=>{
-  [...Array(13).keys()].map(x=>x+1).forEach((n)=>{
-    // カードおもて
-    let front = document.createElement('div');
-    let sign = "<span>"+n+"<br/>"+m+"</span>";
-    let pattern = " "+m+" ";
-    front.innerHTML=sign+pattern+sign;
-    front.classList.add('front');
-    // カードうら
-    let back = document.createElement('div');
-    back.classList.add('back');
-    // カード
-    let card = document.createElement('div');
-    card.appendChild(front);
-    card.appendChild(back);
-    card.classList.add('card');
-    card.classList.add((m=="&#9829;"||m=="&#9830;") ? "red" : "black");
-    card.classList.add('open');
-    card.onclick = gen_click_card('card', close);
-    card.style.left = (x+field.offsetLeft)+"px";
-    card.style.top  = (y+field.offsetTop )+"px";
-    x += 60; if(x==(60*13)){ x=0; y += 90; }
-    field.appendChild(card);
-  });
-});
+class Card {
+  constructor(id) {
+    let suit = SUIT[Math.floor(id/13)];
+    let rank = RANK[id%13];
+    { // DOMの生成
+      // カードおもて
+      let front = document.createElement('div');
+      let sign = "<span>"+rank+"<br/>"+suit+"</span>";
+      let pattern = " "+suit+" ";
+      front.innerHTML=sign+pattern+sign;
+      front.classList.add('front');
+      // カードうら
+      let back = document.createElement('div');
+      back.classList.add('back');
+      // カード
+      let card = document.createElement('div');
+      card.appendChild(front);
+      card.appendChild(back);
+      card.classList.add('card');
+      card.classList.add((suit=="&#9829;"||suit=="&#9830;") ? "red" : "black");
+      //card.classList.add('open');
+      card.style.left = (STOCK_LEFT+field.offsetLeft)+"px";
+      card.style.top  = (STOCK_TOP +field.offsetTop )+"px";
+      field.appendChild(card);
+      card.id = "card_"+id;
+      this.dom = card;
+    }
+    this.suit = suit;
+    this.rank = rank;
+  }
+  moveto(left, top) {
+    this.dom.style.left = (left + field.offsetLeft)+"px";
+    this.dom.style.top  = (top  + field.offsetTop )+"px";
+  }
+  flip() {
+    flip(this.dom);
+  }
+}
+let FULLDECK = [...Array(52).keys()].map(id=>new Card(id));
+function get_instance_from_dom(dom) {
+  FULLDECK.filter(x=>x.dom===dom)[0];
+}
 
-//Array.prototype.forEach.call(
-//  document.getElementsByClassName("card"),
-//  (e)=>{e.onclick = gen_click_card('card', open)}
-//);
+
+(function(){
+  let deck = FULLDECK.map(x=>x);
+  shuffle(deck);
+  let c1 = null, c2 = null;
+  deck.slice(0,31).forEach(card=>{
+    card.dom.onclick = gen_click_card('card',function(dom){
+      flip(dom);
+      if(c1==null) {
+        c1 = card;
+      } else {
+        c2 = card;
+        setTimeout(function(){
+          if(c1.rank==c2.rank) {
+            c1.moveto(500,0);
+            c2.moveto(500,0);
+          } else {
+            c1.flip();
+            c2.flip();
+          }
+          c1 = null;
+          c2 = null;
+        }, 1000);
+      }
+    });
+  });
+  for(let i=0;i<5;i++){
+    for(let j=0;j<6;j++){
+      let card = deck.shift();
+      setTimeout(()=>card.moveto(i*80, j*100), 100*(j*5+i));
+    }
+  }
+})();
 </script>
 </body>
 </html>
