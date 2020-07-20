@@ -74,7 +74,7 @@ class Card {
       card.appendChild(front);
       card.appendChild(back);
       card.classList.add('card');
-      card.classList.add(SUIT.indexOf(suit)>1 ? "red" : "black");
+      card.classList.add(SUIT.indexOf(suit)%2==1 ? "red" : "black");
       //card.classList.add('open');
       card.style.left = (STOCK_LEFT+field.offsetLeft)+"px";
       card.style.top  = (STOCK_TOP +field.offsetTop )+"px";
