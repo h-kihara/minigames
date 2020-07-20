@@ -10,11 +10,14 @@
 <body>
 <h1>Flip the Card</h1>
 <div id="field"></div>
+<div id="cover" style="position: absolute; left: 0px; width:1000px; top:0px; height:1000px; opacity:10%; z-index: -1000;"></div>
 <!-- https://qiita.com/nagtkk/items/27ff4f2fe17746afabdd -->
 <script>
 const SUIT = ["&#9824;","&#9829;","&#9827;","&#9830;"];
 const RANK = [...Array(13).keys()].map(x=>x+1);
 const field = document.getElementById('field');
+const cover = document.getElementById('cover');
+cover.style.zIndex = -1000;
 
 /*
  onclick用の関数を生成する
@@ -45,27 +48,6 @@ function flip(dom){
 let STOCK_LEFT = 880;
 let STOCK_TOP  = 40;
 /*
-// 場からストックに仕舞う  (／ストックから場に出す)
-function moveto(card) {
-  const _stock_left = (STOCK_LEFT+field.offsetLeft)+"px";
-  const _stock_top  = (STOCK_TOP +field.offsetTop )+"px";
-  function is_on_stock(_card) {
-    console.log(_card.style.left,_card.style.top,_stock_left,_stock_top);
-    return _card.style.left==_stock_left && _card.style.top==_stock_top;
-  }
-  if(is_on_stock(card)) {
-    let id = card.id.split("_")[1];
-    let m = Math.floor(id/13);
-    let n = id%13;
-    card.style.left = (n * 60 + field.offsetLeft)+"px";
-    card.style.top  = (m * 90 + field.offsetTop )+"px";
-  }else{
-    card.style.left = _stock_left;
-    card.style.top  = _stock_top;
-  }
-}
-*/
-/*
   <div class="card">
     <div class="front">
       <span>7<br/>&#9824;</span> &#9824; <span>7<br/>&#9824;</span>
@@ -80,9 +62,9 @@ class Card {
     { // DOMの生成
       // カードおもて
       let front = document.createElement('div');
-      let sign = "<span>"+rank+"<br/>"+suit+"</span>";
-      let pattern = " "+suit+" ";
-      front.innerHTML=sign+pattern+sign;
+      let sign = "<span>" + rank + "<br/>" + suit + "</span>";
+      let pattern = " " + suit + " ";
+      front.innerHTML=sign + pattern + sign;
       front.classList.add('front');
       // カードうら
       let back = document.createElement('div');
@@ -92,7 +74,7 @@ class Card {
       card.appendChild(front);
       card.appendChild(back);
       card.classList.add('card');
-      card.classList.add((suit=="&#9829;"||suit=="&#9830;") ? "red" : "black");
+      card.classList.add(SUIT.indexOf(suit)>1 ? "red" : "black");
       //card.classList.add('open');
       card.style.left = (STOCK_LEFT+field.offsetLeft)+"px";
       card.style.top  = (STOCK_TOP +field.offsetTop )+"px";
@@ -121,29 +103,45 @@ function get_instance_from_dom(dom) {
   let deck = FULLDECK.map(x=>x);
   shuffle(deck);
   let c1 = null, c2 = null;
+  // 今から並べるカードに神経衰弱の機能を賦与する
   deck.slice(0,31).forEach(card=>{
     card.dom.onclick = gen_click_card('card',function(dom){
+      // 今さっき開いたカードは何もしない
+      if(card==c1){
+        return;
+      }
+      // 伏せてあるカードを開く
       flip(dom);
       if(c1==null) {
+        // １枚目
         c1 = card;
       }else if(c2==null){
+        // ２枚目
         c2 = card;
+        // アニメーションする間、操作不可
+        document.getElementById('cover').style.zIndex = 1000;
+        // ２枚開けてから１秒間ストップした上で、アクションを起こす
         setTimeout(function(){
           if(c1.rank==c2.rank) {
+            // 一致していたらカードをゲット、場から外す
             c1.dom.classList.remove('selectable');
             c2.dom.classList.remove('selectable');
             c1.moveto(500,0);
             c2.moveto(500,0);
           } else {
+            // 一致していなかったら２枚とも伏せる
             c1.flip();
             c2.flip();
           }
           c1 = null;
           c2 = null;
+          // さらに0.3秒間 transform を待ってから、カバーを外す
+          setTimeout(()=>{document.getElementById('cover').style.zIndex = -1000;},300);
         }, 1000);
       }
     });
   });
+  // カードを場に並べる
   for(let i=0;i<5;i++){
     for(let j=0;j<6;j++){
       let card = deck.shift();
