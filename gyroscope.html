@@ -2,32 +2,54 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gyroscope</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gyroscope</title>
 </head>
 
 <body>
-<div><h1 id="absolute"></h1></div>
-<div><h1 id="alpha"></h1></div>
-<div><h1 id="beta"></h1></div>
-<div><h1 id="gamma"></h1></div>
+  <div>
+    <h1 id="absolute"></h1>
+  </div>
+  <div>
+    <h1 id="alpha"></h1>
+  </div>
+  <div>
+    <h1 id="beta"></h1>
+  </div>
+  <div>
+    <h1 id="gamma"></h1>
+  </div>
+  <script>
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+
+      //popupOpen("requestPermissionPopup");
+      DeviceOrientationEvent.requestPermission().then(response => {
+        if (response === 'granted') {
+          window.addEventListener("deviceorientation", handleOrientation, true);
+        }
+      }).catch(console.error);
+    } else {
+      // non iOS 13+
+      window.addEventListener("deviceorientation", handleOrientation, true);
+    }
 
-<script>
-window.addEventListener("deviceorientation", handleOrientation, true);
-console.log('aaaa');
-const absolute = document.getElementById('absolute');
-const alpha = document.getElementById('alpha');
-const beta = document.getElementById('beta');
-const gamma = document.getElementById('gamma');
-function handleOrientation(event) {
+    //window.addEventListener("deviceorientation", handleOrientation, true);
+    //window.addEventListener("devicemotion", handleOrientation, true);
+    console.log('aaaa');
+    const absolute = document.getElementById('absolute');
+    const alpha = document.getElementById('alpha');
+    const beta = document.getElementById('beta');
+    const gamma = document.getElementById('gamma');
 
-  absolute.textContent = event.absolute;
-  alpha.textContent = event.alpha;
-  beta.textContent = event.beta;
-  gamma.textContent = event.gamma;
-}
-</script>
+    function handleOrientation(event) {
+
+      absolute.textContent = event.absolute;
+      alpha.textContent = event.alpha;
+      beta.textContent = event.beta;
+      gamma.textContent = event.gamma;
+    }
+  </script>
 </body>
 
 </html>
