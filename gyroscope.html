@@ -2,8 +2,8 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Gyroscope</title>
 </head>
 
@@ -33,6 +33,24 @@
       // non iOS 13+
       window.addEventListener("deviceorientation", handleOrientation, true);
     }
+    
+    if(DeviceMotionEvent.requestPermission){
+      DeviceMotionEvent.requestPermission()
+      .then(permissionStatus => {
+        if(permissionStatus === 'granted'){
+          window.addEventListener('devicemotion', (e)=>{
+            if(!e.accelerationIncludingGravity){
+              alert('No accelerationIncludingGravity');
+              return;
+            }
+            alert(e.accelerationIncludingGravity.x);
+          });
+        }
+      })
+      .catch(console.error);
+    }else{
+      alert('No requestPermission');
+    }
 
     //window.addEventListener("deviceorientation", handleOrientation, true);
     //window.addEventListener("devicemotion", handleOrientation, true);
@@ -44,11 +62,21 @@
 
     function handleOrientation(event) {
 
-      absolute.textContent = event.absolute;
-      alpha.textContent = event.alpha;
-      beta.textContent = event.beta;
-      gamma.textContent = event.gamma;
+      absolute.textContent = FormatReal(event.absolute,3,4);
+      alpha.textContent = FormatReal(event.alpha,3,4);
+      beta.textContent = FormatReal(event.beta,3,4);
+      gamma.textContent = FormatReal(event.gamma,3,4);
     }
+    function FormatReal(real, k1, k2){
+      let int = Math.floor(real);
+      let frc = real -int;
+      int = ('='.repeat(k1)+int).slice(k1);
+      frc = Math.floor(frc*Math.pow(10, k2)) % Math.pow(10, k2);
+      return int + '.' + frc;
+    }
+  </script>
+  <script>
+  console.log(DeviceMotionEvent.requestPermission())
   </script>
 </body>
 
