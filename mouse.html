@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<canvas id="canvas" width="600" height="600" style="border:solid black 1px;">
+<canvas id="canvas" width="300" height="400" style="border:solid black 1px;">
   Your browser does not support canvas element.
 </canvas>
 <br>
@@ -20,6 +20,17 @@ function startup() {
   el.addEventListener("touchend", handleEnd, false);
   el.addEventListener("touchcancel", handleCancel, false);
   el.addEventListener("touchmove", handleMove, false);
+}
+var ongoingTouches = [];
+function handleStart(evt){
+  evt.preventDefault();
+  console.log("touchstart.");
+  var el = document.getElementById('canvas');
+  var ctx = el.getContext("2d");
+  var touches = evt.changedTouches;
+
+  for(let i=0;i<touches.length;i++){
+    ongoingTouches.push(copyTouch(touches[i]));
 }
 
 document.addEventListener("DOMContentLoaded", startup);
