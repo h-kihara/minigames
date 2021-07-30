@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+  <div id="container">
+    <svg id="svg" width="400" height="400" viewBox="0,-100,400,400" xmlns="http://www.w3.org/2000/svg" style="background:#eee">
+      <polygon points="10 10 20 20 30 10 20 0"
+               stroke="#000" fill="white"
+               className="right"
+               onclick="round();"/>
+    </svg>
+  </div>
+  <script>
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.getElementById('svg');
+    const phi = 0.3,
+      rho = -0.5;
+
+    function create3dPolygon(points, stroke, fill, className) {
+      const p2 = points
+        .map( ([x, y, z]) => [x + y * phi, z + y * rho]);
+      const p3 = p2
+        .reduce((acc, [x, y]) => acc + " " + x + " " + y, "")
+      const ten = document.createElementNS(NS, 'polygon');
+      ten.setAttribute('points', p3);
+      ten.setAttribute('stroke', stroke);
+      ten.setAttribute('fill', fill);
+      ten.setAttribute('class', className);
+      ten.setAttribute('stroke-linejoin', 'round')
+      svg.appendChild(ten);
+      return {
+        p:points,
+        body:ten, 
+        rotate: function(){
+          let cx = cz = 200;
+          let x1 = this.p[0] - cx;
+          let z1 = this.p[2] - cz;
+          let x2 =
+        }, 
+      };
+    }
+    /*
+    const faces = [0,50].map(i=>[0,1,2].map(j=>{ 
+      return [[0,0],[0,50],[50,50],[50,0]].map(p=>{p.splice(j,false,i); return p;});
+        })).flat();
+    faces.sort(function(a,b){
+              if(a[1]<b[1]) return 1;
+              if(a[1]>b[1]) return -1;
+              return 0;
+            });
+            */
+    let faces = [
+      { p:[[ 50,100, 50],[100,100,50],[100,100,100],[ 50,100,100]], col:'#FFFF66CC' }, // back   
+      { p:[[ 50,100, 50],[100,100,50],[100,100,100],[ 50,100,100]], col:'#FFFF66CC' }, // bottom 
+      { p:[[ 50,100, 50],[ 50, 50,50],[ 50, 50,100],[ 50,100,100]], col:'#FFAA66CC' }, // left
+      
+      { p:[[100,100, 50],[100, 50,50],[100, 50,100],[100,100,100]], col:'#6666FFCC' }, // right
+      { p:[[ 50, 50, 50],[100, 50,50],[100,100, 50],[ 50,100, 50]], col:'#66FF66CC' }, // top
+      { p:[[ 50, 50, 50],[100, 50,50],[100, 50,100],[ 50, 50,100]], col:'#FFFDFFCC' }, // front
+    ].map(f => {
+      create3dPolygon(f.p, "black", f.col);
+    });
+    
+    function round(){
+      
+    }
+  </script>
+</body>
+
+</html>
+

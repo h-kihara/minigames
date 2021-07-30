@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    #wrapper {
+      position: relative;
+      width: 50%;
+      height: auto;
+      background-color: #eee;
+    }
+
+    #wrapper::before {
+      content: "";
+      display: block;
+      padding-top: 100%;
+      width: 25%;
+    }
+
+    #field {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #c0ffee;
+    }
+
+    .depth::before {}
+
+    .layer {
+      position: absolute;
+      left: 0;
+      top:0;
+      width: 90%;
+      height: 90%;
+      margin: 5%;
+      background-color: lightgreen;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .cell {
+      flex: 0 0 25%;
+      position: relative;
+      background-color: #facade;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="xfield"></div>
+  <div id="wrapper">
+    <div id="field">
+      <div class="layer">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+      <div class="layer">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function generateDom(tensor) {
+      const field = document.getElementById('field');
+      const x = tensor.length;
+      const y = tensor[0].length;
+      const z = tensor[0][0].length;
+      [...Array(z)].forEach((p)=>{
+        const 
+        [...Array(x*y)].forEach(c=>{
+          
+        })
+      });
+    }
+  </script>
+</body>
+
+</html>

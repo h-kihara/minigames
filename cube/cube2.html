@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <style type="text/css">
+    .container {
+      width: 100px;
+      height: 100px;
+      margin: 24px;
+      border: none;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      backface-visibility: visible;
+      perspective: 800px;
+      transform-style: preserve-3d;
+      perspective-origin: 200% -150%;
+    }
+
+    .face {
+      display: block;
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border: none;
+      line-height: 100px;
+      font-family: sans-serif;
+      font-size: 60px;
+      color: white;
+      text-align: center;
+      transition: 1s linear;
+    }
+
+    .orange {
+      background-color: #FFAA66DD;
+    }
+
+    .red {
+      background-color: #FF6666DD;
+    }
+
+    .blue {
+      background-color: #6666FFDD;
+    }
+
+    .green {
+      background-color: #66FF66DD;
+    }
+
+    .yellow {
+      background-color: #FFFF66DD;
+    }
+    .white { background-color: #FFFFEEDD}
+
+    .top {
+      transform: rotateX(90deg) translateZ(50px);
+    }
+
+    .bottom {
+      transform: rotateX(-90deg) translateZ(50px);
+    }
+
+    .left {
+      transform: rotateY(-90deg) translateZ(50px);
+    }
+
+    .right {
+      transform: rotateY(90deg) translateZ(50px);
+    }
+
+    .back {
+      transform: rotateY(180deg) translateZ(50px);
+    }
+    .back_p {
+      transform: rotateX(180deg) translateZ(50px);
+    }
+
+    .front {
+      transform: translateZ(50px);
+    }
+
+    .button {
+      margin: 20px;
+      width: 40px;
+      height: 40px;
+      background-color: orange;
+    }
+  </style>
+</head>
+
+<body>
+  <h1></h1>
+  <div class="container">
+    <div class="cube">
+      <div class="face white top   "></div>
+      <div class="face yellow bottom"></div>
+      <!--
+      <div class="face blue left  "></div>
+      <div class="face red right "></div>
+      -->
+      <div class="face green back  "></div>
+      <div class="face orange front "></div>
+    </div>
+  </div>
+  <div class="button" onclick="hoge();">hoge</div>
+  <script>
+    function hoge() {
+      var top = document.getElementsByClassName('top')[0];
+      var front = document.getElementsByClassName('front')[0];
+      var bottom = document.getElementsByClassName('bottom')[0];
+      var back = document.getElementsByClassName('back')[0];
+      top.classList.replace('top', 'back_p');
+      front.classList.replace('front', 'top');
+      bottom.classList.replace('bottom', 'front');
+    }
+  </script>
+  <script src="maze.js"></script>
+</body>
+
+</html>
