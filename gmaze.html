@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+#svg {
+  background-color: #c0ffee;
+}
+</style>
+</head>
+<body>
+<h1></h1>
+<div>
+<svg id="svg" width="360" height="360" viewBox="0 0 360 360">
+<!--
+<polygon points="170,130 220,130 220,180 170,180" stroke="black" fill="#FFAA66DD"/>
+<polygon points="150,200 200,200 220,180 170,180" stroke="black" fill="#FFAA66DD"/>
+<polygon points="150,150 150,200 170,180 170,130" stroke="black" fill="#FFAA66DD"/>
+<polygon points="150,150 200,150 200,200 150,200" stroke="black" fill="#FFAA66DD"/>
+<polygon points="150,150 200,150 220,130 170,130" stroke="black" fill="#FFAA66DD"/>
+<polygon points="200,150 200,200 220,180 220,130" stroke="black" fill="#FFAA66DD"/>
+<polygon points="150,150 200,150 200,200 150,200" stroke="black" fill="#FFAA66DD"/>
+
+<polygon points="270 130 320 130 320 180 270 180" stroke="black" fill="#FFFF66DD"/>
+<polygon points="250 200 300 200 320 180 270 180" stroke="black" fill="#6666FFDD"/>
+<polygon points="250 150 250 200 270 180 270 130" stroke="black" fill="#FF6666DD"/>
+<polygon points="250 150 300 150 300 200 250 200" stroke="black" fill="#FFFFFFDD"/>
+<polygon points="250 150 300 150 320 130 270 130" stroke="black" fill="#66FF66DD"/>
+<polygon points="300 150 300 200 320 180 320 130" stroke="black" fill="#FFAA66DD"/>
+<polygon points="250 150 300 150 300 200 250 200" stroke="black" fill="#FFFFFFDD"/>
+-->
+</svg>
+</div>
+<div id="LockButton"></div>
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+const InitialVertices = [...Array(8).keys()].map(n=>{
+  return {
+    x: Math.floor(n/4),
+    y: Math.floor(n/2) % 2,
+    z: n % 2,
+  }
+});
+
+let faces = [
+        {filter:w=>w.x<=0, color:"#FFFF66FF"},
+        {filter:w=>w.x> 0, color:"#6666FFFF"},
+        {filter:w=>w.y<=0, color:"#FF6666FF"},
+        {filter:w=>w.y> 0, color:"#FFFFFFFF"},
+        {filter:w=>w.z<=0, color:"#66FF66FF"},
+        {filter:w=>w.z> 0, color:"#FFAA66FF"}, ]
+    .map(f=>{return {v: InitialVertices.filter(f.filter), c:f.color}})
+    .map(f=>{return {v: [f.v[0],f.v[1],f.v[3],f.v[2]], c: f.c}});
+
+function rotateX(p, a) {
+  return {
+    x: p.x                                         ,
+    y:  0 +  p.y *  Math.cos(a) + p.z * Math.sin(a),
+    z:  0 +  p.y * -Math.sin(a) + p.z * Math.cos(a),
+  };
+}
+function rotateY(p, a) {
+  return {
+    x: p.x *  Math.cos(a) +  0  + p.z * Math.sin(a),
+    y:                      p.y                    ,
+    z: p.x * -Math.sin(a) +  0  + p.z * Math.cos(a),
+  };
+}
+function rotateZ(p, a) {
+  return {
+    x: p.x * Math.cos(a) + p.y * -Math.sin(a) + 0  ,
+    y: p.x * Math.sin(a) + p.y *  Math.cos(a) + 0  ,
+    z:                                         p.z ,
+  };
+}
+function translate(p, dx, dy=undefined, dz=undefined) {
+  if(dy==undefined){
+    d = dx;
+    return {
+      x: p.x + d.x,
+      y: p.y + d.y,
+      z: p.z + d.z,
+    };
+  } else {
+    return {
+      x: p.x + dx,
+      y: p.y + dy,
+      z: p.z + dz,
+    };
+  }
+}
+
+function resetFaces(faces) {
+  // 現状svgを削除
+  while (svg.lastChild) { svg.removeChild(svg.lastChild); }
+  // 平行投影法風
+  faces.sort((f1,f2)=>f1.v.reduce((acc,v)=>acc+v.z-v.x*0.2-v.y*0.25,0) - f2.v.reduce((acc,v)=>acc+v.z-v.x*0.2-v.y*0.25,0));
+  // svg再生成
+  faces.forEach(f=>{
+    const points = f.v.map(v=>(150 + 50 * (v.x+v.z*0.2)) + "," + (150 + 50 *(v.y+v.z*0.25))).join(" ");
+    const body = document.createElementNS(NS, 'polygon');
+    body.setAttribute('points', points);
+    body.setAttribute('stroke', "black");
+    body.setAttribute('fill', f.c);
+    svg.appendChild(body);
+  });
+}
+
+
+
+
+document.body.addEventListener('keydown',event=>{
+  const svg = document.getElementById('svg');
+  if(event.key==='h' || event.key==='ArrowLeft' || event.key==='a') { move(-1,  0); }
+  if(event.key==='j' || event.key==='ArrowDown' || event.key==='s') { move( 0,  1); }
+  if(event.key==='k' || event.key==='ArrowUp'   || event.key==='w') { move( 0, -1); }
+  if(event.key==='l' || event.key==='ArrowRight'|| event.key==='d') { move( 1,  0); }
+  if(event.key==='Enter') {resetFaces(faces);}
+});
+
+
+function getOffset(faces) {
+  return {
+    x:     - Math.min(...faces.map(f=>f.v.map(v=>v.x)).flat()),
+    y: 1   - Math.max(...faces.map(f=>f.v.map(v=>v.y)).flat()),
+    z:     - Math.min(...faces.map(f=>f.v.map(v=>v.z)).flat()),
+  };
+}
+
+function move(dx, dy) {
+  const rot = dx==0 ? rotateX : rotateZ;
+  const a = Math.PI/6 * (dx+dy);
+  const anime = function(n){
+    faces = faces.map(face=>{ return {v: face.v.map(p=>rot(p, a)), c: face.c}; });
+    const offset = getOffset(faces);
+    faces = faces.map(face=>{ return {v: face.v.map(p=>translate(p, offset)), c: face.c}; });
+    resetFaces(faces);
+    setTimeout(function(){
+      if(n>0) anime(n-1);
+    }, 100);
+  };
+  anime(2);
+}
+
+
+
+
+
+</script>
+</body>
+</html>

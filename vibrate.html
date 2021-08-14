@@ -12,19 +12,25 @@
     <input type="button" id="vibrate" value="ぶるぶる">
   </form>
   <script>
-    //window.addEventListener("load", function() {
+    window.addEventListener("load", function() {
       document.getElementById("vibrate").addEventListener("click", function() {
         if (window.navigator.vibrate) {
-          window.navigator.vibrate([200, 200, 200, 200, 200]);
+          console.log("normal");
+          let result = window.navigator.vibrate([200, 200, 200, 200, 200]);
+          console.log(result ? "Success" : "Failure");
         } else if (window.navigator.mozVibrate) {
-          window.navigator.mozVibrate([200, 200, 200]);
+          console.log("moz-");
+          let result = window.navigator.mozVibrate([200, 200, 200]);
+          console.log(result ? "Success" : "Failure");
         } else if (window.navigator.webkitVibrate) {
-          window.navigator.webkitVibrate([200]);
+          console.log("webkit-");
+          let result = window.navigator.webkitVibrate([200]);
+          console.log(result ? "Success" : "Failure");
         } else {
           alert("sorry (T-T)");
         }
       }, true);
-    //}, true);
+    }, true);
   </script>
 </body>
 
