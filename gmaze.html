@@ -89,6 +89,13 @@
         { filter: w => w.z > 0, color: "#FFAA66FF" }, ]
       .map(f => { return { v: InitialVertices.filter(f.filter), c: f.color } })
       .map(f => { return { v: [f.v[0], f.v[1], f.v[3], f.v[2]], c: f.c } });
+    
+    const W = 6, H = 6;
+    let grid = 
+      [...Array(W+1).keys()].map(n=>[0,n,H,n]).concat(
+      [...Array(H+1).keys()].map(n=>[n,0,n,W]));
+      
+
 
     function rotateX(p, a) {
       return {
@@ -146,6 +153,22 @@
         cube.appendChild(body);
       });
     }
+    
+    function resetField(grid) {
+      while(field.lastChild) { field.removeChild(field.lastChild); }
+      grid.forEach(g => {
+        const p = [
+          150 + 50 * (g[0] + g[1] * 0.2), 150 + 50 * (0 + g[1] * 0.25), 
+          150 + 50 * (g[2] + g[3] * 0.2), 150 + 50 * (0 + g[3] * 0.25)];
+        const body = document.createElementNS(NS, 'line');
+        body.setAttribute('x1', p[0]);
+        body.setAttribute('y1', p[1]);
+        body.setAttribute('x2', p[2]);
+        body.setAttribute('y2', p[3]);
+        body.setAttribute('stroke', 'black');
+        field.appendChild(body);
+      });
+    }
 
 
 
@@ -175,6 +198,14 @@
         const offset = getOffset(faces);
         faces = faces.map(face => { return { v: face.v.map(p => translate(p, offset)), c: face.c }; });
         resetFaces(faces);
+        grid = grid.map(g => [
+          g[0]-offset.x, 
+          g[1]-offset.z, 
+          g[2]-offset.x, 
+          g[3]-offset.z, 
+        ]);
+        console.log(offset.x, grid);
+        resetField(grid);
         setTimeout(function() {
           if (n > 0) anime(n - 1);
         }, 100);
